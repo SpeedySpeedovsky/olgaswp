@@ -1,42 +1,43 @@
 <?php
 /**
- * The base configurations of the WordPress.
+ * The base configuration for WordPress
  *
- * This file has the following configurations: MySQL settings, Table Prefix,
- * Secret Keys, WordPress Language, and ABSPATH. You can find more information
- * by visiting {@link http://codex.wordpress.org/Editing_wp-config.php Editing
- * wp-config.php} Codex page. You can get the MySQL settings from your web host.
+ * The wp-config.php creation script uses this file during the
+ * installation. You don't have to use the web site, you can
+ * copy this file to "wp-config.php" and fill in the values.
  *
- * This file is used by the wp-config.php creation script during the
- * installation. You don't have to use the web site, you can just copy this file
- * to "wp-config.php" and fill in the values.
+ * This file contains the following configurations:
+ *
+ * * MySQL settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://codex.wordpress.org/Editing_wp-config.php
  *
  * @package WordPress
  */
 
-// ** Heroku Postgres settings - from Heroku Environment ** //
-$db = parse_url($_ENV["DATABASE_URL"]);
-
-// ** MySQL settings - You can get this info from your web host ** //
+// ** MySQL settings ** //
 /** The name of the database for WordPress */
-define('DB_NAME', trim($db["path"],"/"));
+define( 'DB_NAME', 'id4657138_wp_05a1a069e0a65ffd9a7d26dd0bdd2e0c' );
 
 /** MySQL database username */
-define('DB_USER', $db["user"]);
+define( 'DB_USER', 'id4657138_wp_ec45fa4c1816ade68ab7dc92812d0269' );
 
 /** MySQL database password */
-define('DB_PASSWORD', $db["pass"]);
+define( 'DB_PASSWORD', 'da78f81b38324fd6350412ddc39a325edbdde87a' );
 
 /** MySQL hostname */
-define('DB_HOST', $db["host"]);
+define( 'DB_HOST', 'localhost' );
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
+define( 'DB_CHARSET', 'utf8' );
 
 /** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+define( 'DB_COLLATE', '' );
 
-/**#@+
+/**
  * Authentication Unique Keys and Salts.
  *
  * Change these to different unique phrases!
@@ -45,41 +46,31 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',              getenv('AUTH_KEY'));
-define('SECURE_AUTH_KEY',       getenv('SECURE_AUTH_KEY'));
-define('LOGGED_IN_KEY',         getenv('LOGGED_IN_KEY'));
-define('NONCE_KEY',             getenv('NONCE_KEY'));
-define('AUTH_SALT',             getenv('AUTH_SALT'));
-define('SECURE_AUTH_SALT',      getenv('SECURE_AUTH_SALT'));
-define('LOGGED_IN_SALT',        getenv('LOGGED_IN_SALT'));
-define('NONCE_SALT',            getenv('NONCE_SALT'));
-define('AWS_ACCESS_KEY_ID',     getenv('AWS_ACCESS_KEY_ID'));
-define('AWS_SECRET_ACCESS_KEY', getenv('AWS_SECRET_ACCESS_KEY'));
-
-/**#@-*/
+define( 'AUTH_KEY',         '4dNB@ScV6oCvk-!lFCAX?#RmuB0Q`wJvUs*OF*KiijLa=NLh/N<o]kV}BXKQVT+6' );
+define( 'SECURE_AUTH_KEY',  'eSzbYw0,|YM;g)YGf;Qe([^-Zj7C7`J-qk0P{?dZyFo?0)}P%!jzjJr)*uG-OggT' );
+define( 'LOGGED_IN_KEY',    ')3WYZ{q1{0R]/,$nHC!Z]d>C00eQ8QzaoM?OO14yU<Hsz-}?4],yS#i!}}nu.sb$' );
+define( 'NONCE_KEY',        'N/zy*+KDv0HJRN^5aLK/.~5QO`wNkBRE!Vb$iw v`y2KMn)@;W9s;B!vo}?:OB7.' );
+define( 'AUTH_SALT',        'P!gN-sXTD+j.<Yuk_(%IJ+J :(Se@ !.QeL#?f(ba7yAE( Ag|9nJizU`b{!kdKj' );
+define( 'SECURE_AUTH_SALT', ';${wOAH}N$Crm FKOV0WFcPN-zZ%.7I1kr%52xi%>B}EI^^Ay4F(b>lJIMPL,b0z' );
+define( 'LOGGED_IN_SALT',   'r+jvN<Y+R3mxT=Iz*$K@Hw{~i,BUlD2>|R&Kvfuzxpz}l2P>cQS1`ODEy<^zfZZ/' );
+define( 'NONCE_SALT',       '`a|!,~+bLZK~35^LG6Ms&}:-k)Io?v?cS/QPIJqMlh>{dNm&VT_pdzS=Gz_! dU}' );
 
 /**
  * WordPress Database Table prefix.
  *
- * You can have multiple installations in one database if you give each a unique
- * prefix. Only numbers, letters, and underscores please!
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = 'wp_';
+$table_prefix = 'wp_';
 
-/**
- * For developers: WordPress debugging mode.
- *
- * Change this to true to enable the display of notices during development.
- * It is strongly recommended that plugin and theme developers use WP_DEBUG
- * in their development environments.
- */
-define('WP_DEBUG', false);
+
+
 
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
-if ( !defined('ABSPATH') )
-	define('ABSPATH', dirname(__FILE__) . '/');
+if ( ! defined( 'ABSPATH' ) )
+	define( 'ABSPATH', dirname( __FILE__ ) . '/' );
 
 /** Sets up WordPress vars and included files. */
-require_once(ABSPATH . 'wp-settings.php');
+require_once ABSPATH . 'wp-settings.php';
