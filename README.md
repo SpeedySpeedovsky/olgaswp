@@ -1,146 +1,145 @@
-## How to setup WordPress on Heroku with the Heroku Buildpack for PHP
+# WordPress Heroku
 
-This will set up a fresh WordPress install on Heroku with the newly released [Heroku Buildpack for PHP](https://github.com/heroku/heroku-buildpack-php).
+This project is a template for installing and running [WordPress](http://wordpress.org/) on [Heroku](http://www.heroku.com/). The repository comes bundled with:
+* [PostgreSQL for WordPress](http://wordpress.org/extend/plugins/postgresql-for-wordpress/)
+* [Amazon S3 and Cloudfront](https://wordpress.org/plugins/amazon-s3-and-cloudfront/)
+* [WP Sendgrid](https://wordpress.org/plugins/wp-sendgrid/)
+* [Wordpress HTTPS](https://wordpress.org/plugins/wordpress-https/)
 
-* `nginx` - Nginx for serving web content.
-* `PHP` - PHP-FPM for process management.
-* `WordPress` - Downloaded from the Github WordPress Repo.
-* `MySQL` - ClearDB for the MySQL backend.
-* `Sendgrid` - Sendgrid for the email backend.
-* `MemCachier` - MemCachier for the memcached backend.
-* `New Relic`- Monitoring
+## Installation
 
-## Getting started
+Clone the repository from Github
 
-Use the Deploy to Heroku button, or use the old fashioned way described below.
+    $ git clone git://github.com/mhoofman/wordpress-heroku.git
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+With the [Heroku gem](http://devcenter.heroku.com/articles/heroku-command), create your app
 
-Clone this repository into a new directory.
+    $ cd wordpress-heroku
+    $ heroku create
+    Creating strange-turtle-1234... done, stack is cedar
+    http://strange-turtle-1234.herokuapp.com/ | git@heroku.com:strange-turtle-1234.git
+    Git remote heroku added
 
-Create your Heroku app.
+Add a database to your app
 
-```bash
-heroku apps:create application-name --stack cedar --buildpack https://github.com/heroku/heroku-buildpack-php --region eu
+    $ heroku addons:create heroku-postgresql
+    Creating HEROKU_POSTGRESQL_INSTANCE... done, (free)
+    Adding HEROKU_POSTGRESQL_INSTANCE to strange-turtle-1234... done
+    Setting DATABASE_URL and restarting strange-turtle-1234... done, v3
+    Database has been created and is available
+     ! This database is empty. If upgrading, you can transfer
+     ! data from another database with pgbackups:restore
+    Use `heroku addons:docs heroku-postgresql` to view documentation.
+
+Promote the database (replace HEROKU_POSTGRESQL_INSTANCE with the name from the above output)
+
+    $ heroku pg:promote HEROKU_POSTGRESQL_INSTANCE
+    Promoting HEROKU_POSTGRESQL_INSTANCE to DATABASE_URL... done
+    Ensuring an alternate alias for existing DATABASE... done, HEROKU_POSTGRESQL_COLOR
+    Promoting HEROKU_POSTGRESQL_INSTANCE to DATABASE_URL on strange-turtle-1234... done
+
+Add the ability to send email (i.e. Password Resets etc)
+
+    $ heroku addons:create sendgrid:starter
+    Creating SENDGRID_INSTANCE... done, (free)
+    Adding SENDGRID_INSTANCE to strange-turtle-1234... done
+    Setting SENDGRID_PASSWORD, SENDGRID_USERNAME and restarting strange-turtle-1234... done, v7
+    Use `heroku addons:docs sendgrid` to view documentation.
+
+Create a new branch for any configuration/setup changes needed
+
+    $ git checkout -b production
+
+Store unique keys and salts in Heroku environment variables. Wordpress can provide random values [here](https://api.wordpress.org/secret-key/1.1/salt/).
+
+    heroku config:set AUTH_KEY='put your unique phrase here' \
+      SECURE_AUTH_KEY='put your unique phrase here' \
+      LOGGED_IN_KEY='put your unique phrase here' \
+      NONCE_KEY='put your unique phrase here' \
+      AUTH_SALT='put your unique phrase here' \
+      SECURE_AUTH_SALT='put your unique phrase here' \
+      LOGGED_IN_SALT='put your unique phrase here' \
+      NONCE_SALT='put your unique phrase here'
+
+Deploy to Heroku
+
+    $ git push heroku production:master
+    -----> Deleting 0 files matching .slugignore patterns.
+    -----> PHP app detected
+
+     !     WARNING: No composer.json found.
+           Using index.php to declare PHP applications is considered legacy
+           functionality and may lead to unexpected behavior.
+
+    -----> No runtime requirements in composer.json, defaulting to PHP 5.6.2.
+    -----> Installing system packages...
+           - PHP 5.6.2
+           - Apache 2.4.10
+           - Nginx 1.6.0
+    -----> Installing PHP extensions...
+           - zend-opcache (automatic; bundled, using 'ext-zend-opcache.ini')
+    -----> Installing dependencies...
+           Composer version 1.0-dev (ffffab37a294f3383c812d0329623f0a4ba45387) 2014-11-05 06:04:18
+           Loading composer repositories with package information
+           Installing dependencies
+           Nothing to install or update
+           Generating optimized autoload files
+    -----> Preparing runtime environment...
+           NOTICE: No Procfile, defaulting to 'web: vendor/bin/heroku-php-apache2'
+    -----> Discovering process types
+           Procfile declares types -> web
+
+    -----> Compressing... done, 78.5MB
+    -----> Launcing... done, v5
+           http://strange-turtle-1234.herokuapp.com deployed to Heroku
+
+    To git@heroku:strange-turtle-1234.git
+      * [new branch]    production -> master
+
+After deployment WordPress has a few more steps to setup and thats it!
+
+## Usage
+
+Because a file cannot be written to Heroku's file system, updating and installing plugins or themes should be done locally and then pushed to Heroku.
+
+## Updating
+
+Updating your WordPress version is just a matter of merging the updates into
+the branch created from the installation.
+
+    $ git pull # Get the latest
+
+Using the same branch name from our installation:
+
+    $ git checkout production
+    $ git merge master # Merge latest
+    $ git push heroku production:master
+
+WordPress needs to update the database. After push, navigate to:
+
+    http://your-app-url.herokuapp.com/wp-admin
+
+WordPress will prompt for updating the database. After that you'll be good
+to go.
+
+## Deployment optimisation
+
+If you have files that you want tracked in your repo, but do not need deploying (for example, *.md, *.pdf, *.zip). Then add path or linux file match to the `.slugignore` file & these will not be deployed.
+
+Examples:
+```
+path/to/ignore/
+bin/
+*.md
+*.pdf
+*.zip
 ```
 
-`--region eu` is for deploying your app in the European region.
+## Wiki
 
-or on to add this buildpack to an existing app, run
-
-```bash
-heroku config:set BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-php
-```
-
-
-Before you push to Heroku make sure to add the following add-ons.
-
-```bash
-heroku addons:add cleardb
-heroku addons:add sendgrid
-heroku addons:add memcachier
-heroku addons:add papertrail
-heroku addons:add newrelic
-```
-
-Define your AWS keys for the AWS S3 Media Uploader plugin.
-
-```bash
-heroku config:set AWS_ACCESS_KEY_ID=123
-heroku config:set AWS_SECRET_ACCESS_KEY=123
-```
-Some default configurations. WP_CACHE=true will enable Batcache with the Memcachier addon.
-
-```bash
-heroku config:set DISABLE_WP_CRON=true
-heroku config:set WP_CACHE=true
-```
-
-Deploy your WordPress site to Heroku.
-
-```bash
-git add .
-git commit -am "Initial commit"
-git push heroku master
-```
-
-## Overview
-
-```
-└── public                 # Heroku webroot
-    ├── content            # The wp-content directory. Renamed to content to avoid confusion with wp-content - and it looks prettier
-    │   ├── plugins        # Plugins
-    │   ├── mu-plugins     # Required plugins
-    │   └── themes         # Your custom themes
-    │
-    └── wp                 # Where the actual WordPress install will be installed by Composer
-```
-
-## Upgrade WordPress
-
-Update the version number for the WordPress package in composer.json, then run `composer update` and commit the changes in composer.json and composer.lock. Do not upgrade WordPress from the admin-interface as it will not survive a restart or dyno change.
-
-## Setup local development
-
-Make sure you have [Composer](https://getcomposer.org/) installed first, then run
-
-```bash
-composer install
-```
-
-Create a local `.env` file.
-
-```bash
-CLEARDB_DATABASE_URL=mysql://root:123abc@127.0.0.1/my_wordpress_heroku_database_name
-```
-
-or install the heroku config plugin from https://github.com/ddollar/heroku-config and pull your environment variables from Heroku.
-The second option is to use the provided local-sample-config.php and rename it local-config.php. Update it with your local MySQL credentials, and you're good to go.
-
-> NOTE: If you don't have a command-line mysql accessible and working, Mac/Homebrew users can `brew install mysql` and then follow the directions to have launchd start mysql at login. I believe the default username is root and the default password is blank.
-
-Install PHP 5.5 on Mac OS X with Homebrew if you don't already have it installed.
-
-```bash
-brew install --with-fpm php55
-```
-
-Follow the instructions in the output to complete the setup. Most importantly check your .bash_profile or .zshrc and make sure you've set your paths correctly.
-
-```bash
-brew install php55-mcrypt
-brew install nginx
-```
-
-Open a new shell and run `php -v` and `php-fpm -v` and make sure they both read PHP 5.5… If you're still on PHP 5.4 then check your paths again. Make sure /usr/local/sbin is before /usr/sbin in your PATH:
-
-> Mountain Lion comes with php-fpm pre-installed, to ensure you are using the brew version you need to make sure /usr/local/sbin is before /usr/sbin in your PATH:
-
-```bash
-PATH="/usr/local/sbin:$PATH"
-```
-
-Add this below Heroku Toolbelt setting in .bashrc or .bash_profile to swap the PHP you use on the command line.
-
-```bash
-export PATH="$(brew --prefix homebrew/php/php55)/bin:$PATH"
-```
-
-Now to start your local dev environment run to start WordPress on http://localhost:5000/
-
-```bash
-foreman start
-```
-
-If you don't have foreman installed, you can do so with `gem install foreman` assuming you have Ruby running on your system. If it fails, try adding sudo in front of the command.
-
-## Known Issues
-
-If you try to develop locally without syncing your external MemCachier envvars you might see a 500 error or a *You do not have sufficient permissions to access this page.* - message. Workaround is to simply remove object-cache.php and advanced-cache.php from the content dir while doing local dev. In a future release I'll try to have these files added on deploy with Composer.
-
-## Sources
-
-This would not have been possible without the work and resources provided by the following people:
-
-* http://mattstauffer.co/blog/laravel-on-heroku-using-a-buildpack-locally-to-mimic-your-heroku-environment-nginx
-* https://github.com/mchung/wordpress-on-heroku
+* [Custom Domains](https://github.com/mhoofman/wordpress-heroku/wiki/Custom-Domains)
+* [Media Uploads](https://github.com/mhoofman/wordpress-heroku/wiki/Media-Uploads)
+* [Postgres Database Syncing](https://github.com/mhoofman/wordpress-heroku/wiki/Postgres-Database-Syncing)
+* [Setting Up a Local Environment on Linux (Apache)](https://github.com/mhoofman/wordpress-heroku/wiki/Setting-Up-a-Local-Environment-on-Linux-\(Apache\))
+* [Setting Up a Local Environment on Mac OS X](https://github.com/mhoofman/wordpress-heroku/wiki/Setting-Up-a-Local-Environment-on-Mac-OS-X)
+* [More...](https://github.com/mhoofman/wordpress-heroku/wiki)
