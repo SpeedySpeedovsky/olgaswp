@@ -20,16 +20,16 @@
 
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'id4657138_wp_05a1a069e0a65ffd9a7d26dd0bdd2e0c' );
+define( 'DB_NAME', 'd5imgp1a9m28f5' );
 
 /** MySQL database username */
-define( 'DB_USER', 'id4657138_wp_ec45fa4c1816ade68ab7dc92812d0269' );
+define( 'DB_USER', 'swfdqzwudfxsyh' );
 
 /** MySQL database password */
-define( 'DB_PASSWORD', 'da78f81b38324fd6350412ddc39a325edbdde87a' );
+define( 'DB_PASSWORD', '3dc2f239a1bf770be8cedf21b695ee26b572cd21d79b4963118b2b5c6ce7cea5' );
 
 /** MySQL hostname */
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', 'ec2-54-235-90-200.compute-1.amazonaws.com' );
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
